@@ -1,0 +1,38 @@
+name: 📝 PR Welcome Comment
+
+on:
+  pull_request:
+    types: [opened, reopened]  # triggers when a PR is created or reopened
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write     # allow this workflow to comment on PRs
+
+    steps:
+      - name: 💬 Add Welcome Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const author = context.payload.pull_request.user.login;
+            const message = `
+            👋 Hi @${author}!  
+            Thanks for opening this Pull Request 🎉  
+            I will review it soon.  
+
+            🧩 **Tips:**
+            - Please ensure you've followed the PR template.
+            - Add screenshots or test results if applicable.
+            - Tag reviewers if you need feedback.
+
+            Have a great day! ☀️
+            `;
+
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
